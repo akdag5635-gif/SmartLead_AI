@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>AK FEA - Yonetim Paneli</title>
+<style>
+  body { font-family: Arial, sans-serif; background: #14161f; color: #eee; margin: 0; padding: 40px; }
+  h1 { color: #0057B8; }
+  table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+  th, td { text-align: left; padding: 12px; border-bottom: 1px solid #333; }
+  th { background: #1e2230; }
+  tr:hover { background: #1e2230; }
+</style>
+</head>
+<body>
+  <h1>AK FEA - Musteri Adaylari</h1>
+  <table>
+    <thead>
+      <tr><th>Isim</th><th>Telefon</th><th>Mesaj</th><th>Tarih</th></tr>
+    </thead>
+    <tbody id="leadTablosu">
+      <tr><td colspan="4">Yukleniyor...</td></tr>
+    </tbody>
+  </table>
+
+<script>
+  async function leadleriYukle() {
+    const response = await fetch('/api/leads');
+    const veri = await response.json();
+    const tablo = document.getElementById('leadTablosu');
+
+    if (veri.basari && veri.leadler.length > 0) {
+      tablo.innerHTML = veri.leadler.map(l => `
+        <tr>
+          <td>${l.isim}</td>
+          <td>${l.telefon}</td>
+          <td>${l.mesaj || '-'}</td>
+          <td>${l.tarih}</td>
+        </tr>
+      `).join('');
+    } else {
+      tablo.innerHTML = '<tr><td colspan="4">Henuz kayitli lead bulunmuyor.</td></tr>';
+    }
+  }
+
+  leadleriYukle();
+</script>
+</body>
+</html>

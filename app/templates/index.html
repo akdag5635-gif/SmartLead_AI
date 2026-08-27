@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>AK FEA - Akilli Satis Asistani</title>
+<style>
+  body { font-family: Arial, sans-serif; background: #14161f; color: #eee; margin: 0; padding: 40px; }
+  .container { max-width: 700px; margin: 0 auto; }
+  h1 { color: #0057B8; }
+  .chat-box { background: #1e2230; border-radius: 12px; padding: 20px; margin-bottom: 30px; min-height: 200px; }
+  .mesaj { margin-bottom: 10px; padding: 10px; border-radius: 8px; }
+  .mesaj.kullanici { background: #0057B8; text-align: right; }
+  .mesaj.ai { background: #333; }
+  input, textarea { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 6px; border: none; box-sizing: border-box; }
+  button { background: #0057B8; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; }
+  .form-box { background: #1e2230; border-radius: 12px; padding: 20px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>AK FEA - Akilli Satis Asistani</h1>
+  <p>Savunma sanayii ve muhendislik firmalarina FEA analiz danismanligi ve egitim hizmeti.</p>
+
+  <div class="chat-box" id="sohbetKutusu"></div>
+  <input type="text" id="inputMesaj" placeholder="Sorunuzu yazin (orn: carpisma analizi istiyorum)">
+  <button id="btnSor">Sor</button>
+
+  <br><br>
+
+  <div class="form-box">
+    <h3>Iletisim Bilgilerinizi Birakin</h3>
+    <input type="text" id="inputIsim" placeholder="Ad Soyad">
+    <input type="text" id="inputTelefon" placeholder="Telefon">
+    <textarea id="inputNot" placeholder="Ne ile ilgileniyorsunuz? (opsiyonel)"></textarea>
+    <button id="btnKaydet">Kaydet</button>
+    <p id="kayitSonuc"></p>
+  </div>
+</div>
+
+<script>
+  const API = "";  // ayni sunucuda oldugu icin bos birakiyoruz
+  let gecmis = [];
+
+  document.getElementById('btnSor').onclick = async function() {
+    const mesaj = document.getElementById('inputMesaj').value;
+    if (!mesaj) return;
+
+    const kutu = document.getElementById('sohbetKutusu');
+    kutu.innerHTML += `<div class="mesaj kullanici">${mesaj}</div>`;
+    document.getElementById('inputMesaj').value = '';
+
+    const response = await fetch(API + '/api/sohbet', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mesaj: mesaj, gecmis: gecmis })
+    });
+    const veri = await response.json();
+
+    if (veri.basari) {
+      kutu.innerHTML += `<div class="mesaj ai">${veri.cevap}</div>`;
+      gecmis.push({ role: 'user', content: mesaj });
+      gecmis.push({ role: 'assistant', content: veri.cevap });
+    } else {
+      kutu.innerHTML += `<div class="mesaj ai">Hata: ${veri.hata}</div>`;
+    }
+    kutu.scrollTop = kutu.scrollHeight;
+  };
+
+  document.getElementById('btnKaydet').onclick = async function() {
+    const isim = document.getElementById('inputIsim').value;
+    const telefon = document.getElementById('inputTelefon').value;
+    const mesaj = document.getElementById('inputNot').value;
+
+    if (!isim || !telefon) {
+      document.getElementById('kayitSonuc').innerText = 'Isim ve telefon zorunlu.';
+      return;
+    }
+
+    const response = await fetch(API + '/api/leads', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ isim: isim, telefon: telefon, mesaj: mesaj })
+    });
+    const veri = await response.json();
+
+    if (veri.basari) {
+      document.getElementById('kayitSonuc').innerText = 'Kaydedildi, tesekkurler!';
+      document.getElementById('inputIsim').value = '';
+      document.getElementById('inputTelefon').value = '';
+      document.getElementById('inputNot').value = '';
+    } else {
+      document.getElementById('kayitSonuc').innerText = 'Hata: ' + veri.hata;
+    }
+  };
+</script>
+</body>
+</html>
