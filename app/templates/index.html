@@ -56,12 +56,13 @@
     });
     const veri = await response.json();
 
-    if (veri.basari) {
-      kutu.innerHTML += `<div class="mesaj ai">${veri.cevap}</div>`;
+  if (veri.basari) {
+      // Gelen metindeki alt satırları (Enter) <br> etiketine, kalın yazıları da <b> etiketine çeviriyoruz
+      let formatliMesaj = veri.cevap.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+      
+      kutu.innerHTML += `<div class="mesaj ai">${formatliMesaj}</div>`;
       gecmis.push({ role: 'user', content: mesaj });
       gecmis.push({ role: 'assistant', content: veri.cevap });
-    } else {
-      kutu.innerHTML += `<div class="mesaj ai">Hata: ${veri.hata}</div>`;
     }
     kutu.scrollTop = kutu.scrollHeight;
   };
