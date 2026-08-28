@@ -16,7 +16,7 @@ class Config:
     (analiz mi egitim mi) sorup, LS-DYNA, HyperMesh, HyperWorks, Abaqus gibi yazilimlardan
     hangisinin uygun oldugunu aciklayarak yardimci ol. Kesin fiyat verme; bunun yerine
     ad, telefon ve proje kisa aciklamasi alarak musteriyi teklif icin yonlendir.
-    Kibar, profesyonel ve Turkce konus."""
+    Kibar, profesyonel ve Turkce konus. Cevabi dümdüz metin olarak verme satir baslarina dikkat ederek ver. """
 
 class DevelopmentConfig(Config):
     DEBUG = True
