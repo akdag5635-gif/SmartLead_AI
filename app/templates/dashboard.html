@@ -2,48 +2,136 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>AK FEA - Yonetim Paneli</title>
+<title>AK FEA - Yönetim Paneli</title>
+
 <style>
-  body { font-family: Arial, sans-serif; background: #14161f; color: #eee; margin: 0; padding: 40px; }
-  h1 { color: #0057B8; }
-  table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-  th, td { text-align: left; padding: 12px; border-bottom: 1px solid #333; }
-  th { background: #1e2230; }
-  tr:hover { background: #1e2230; }
+  body {
+    font-family: Arial, sans-serif;
+    background: #14161f;
+    color: #eee;
+    margin: 0;
+    padding: 40px;
+  }
+
+  h1 {
+    color: #0057B8;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+
+  th, td {
+    text-align: left;
+    padding: 12px;
+    border-bottom: 1px solid #333;
+  }
+
+  th {
+    background: #1e2230;
+  }
+
+  tr:hover {
+    background: #1e2230;
+  }
 </style>
 </head>
+
 <body>
-  <h1>AK FEA - Musteri Adaylari</h1>
+
+  <h1>AK FEA - Müşteri Adayları</h1>
+
   <table>
     <thead>
-      <tr><th>Isim</th><th>Telefon</th><th>Mesaj</th><th>Tarih</th></tr>
+      <tr>
+        <th>Ad Soyad</th>
+        <th>E-posta</th>
+        <th>Telefon</th>
+        <th>Mesaj</th>
+        <th>Tarih</th>
+      </tr>
     </thead>
+
     <tbody id="leadTablosu">
-      <tr><td colspan="4">Yukleniyor...</td></tr>
+      <tr>
+        <td colspan="5">Yükleniyor...</td>
+      </tr>
     </tbody>
   </table>
 
 <script>
-  async function leadleriYukle() {
+
+async function leadleriYukle() {
+
+  const tablo = document.getElementById('leadTablosu');
+
+  try {
+
     const response = await fetch('/api/leads');
     const veri = await response.json();
-    const tablo = document.getElementById('leadTablosu');
+
+    tablo.textContent = '';
 
     if (veri.basari && veri.leadler.length > 0) {
-      tablo.innerHTML = veri.leadler.map(l => `
-        <tr>
-          <td>${l.isim}</td>
-          <td>${l.telefon}</td>
-          <td>${l.mesaj || '-'}</td>
-          <td>${l.tarih}</td>
-        </tr>
-      `).join('');
-    } else {
-      tablo.innerHTML = '<tr><td colspan="4">Henuz kayitli lead bulunmuyor.</td></tr>';
-    }
-  }
 
-  leadleriYukle();
+      veri.leadler.forEach((lead) => {
+
+        const satir = document.createElement('tr');
+
+        const alanlar = [
+          lead.isim || '-',
+          lead.email || '-',
+          lead.telefon || '-',
+          lead.mesaj || '-',
+          lead.tarih || '-'
+        ];
+
+        alanlar.forEach((deger) => {
+          const hucre = document.createElement('td');
+          hucre.textContent = deger;
+          satir.appendChild(hucre);
+        });
+
+        tablo.appendChild(satir);
+
+      });
+
+    } else {
+
+      const satir = document.createElement('tr');
+      const hucre = document.createElement('td');
+
+      hucre.colSpan = 5;
+      hucre.textContent = 'Henüz kayıtlı müşteri adayı bulunmuyor.';
+
+      satir.appendChild(hucre);
+      tablo.appendChild(satir);
+
+    }
+
+  } catch (error) {
+
+    console.error('Lead yükleme hatası:', error);
+
+    tablo.textContent = '';
+
+    const satir = document.createElement('tr');
+    const hucre = document.createElement('td');
+
+    hucre.colSpan = 5;
+    hucre.textContent = 'Kayıtlar yüklenirken hata oluştu.';
+
+    satir.appendChild(hucre);
+    tablo.appendChild(satir);
+
+  }
+}
+
+leadleriYukle();
+
 </script>
+
 </body>
 </html>
